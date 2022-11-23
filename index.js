@@ -17,10 +17,21 @@ console.log(uri);
 async function run() {
   try {
     const categoryCollection = client.db("jossCar").collection("categories");
+    const carsCollection = client.db("jossCar").collection("allCars");
     app.get("/categories", async (req, res) => {
       const query = {};
       const categories = await categoryCollection.find(query).toArray();
       res.send(categories);
+    });
+    app.get("/allcars", async (req, res) => {
+      let query = {};
+      if (req.query.categoryID) {
+        query = {
+          categoryID: req.query.categoryID,
+        };
+      }
+      const allcars = await carsCollection.find(query).toArray();
+      res.send(allcars);
     });
   } finally {
   }
