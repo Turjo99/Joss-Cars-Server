@@ -19,6 +19,7 @@ async function run() {
     const categoryCollection = client.db("jossCar").collection("categories");
     const carsCollection = client.db("jossCar").collection("allCars");
     const usersCollection = client.db("jossCar").collection("users");
+    const bookingsCollection = client.db("jossCar").collection("bookings");
     app.get("/categories", async (req, res) => {
       const query = {};
       const categories = await categoryCollection.find(query).toArray();
@@ -38,6 +39,12 @@ async function run() {
       const user = req.body;
 
       const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+    app.post("/bookings", async (req, res) => {
+      const booking = req.body;
+
+      const result = await bookingsCollection.insertOne(booking);
       res.send(result);
     });
   } finally {
