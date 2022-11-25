@@ -35,6 +35,16 @@ async function run() {
       const allcars = await carsCollection.find(query).toArray();
       res.send(allcars);
     });
+    app.get("/sellerproducts", async (req, res) => {
+      let query = {};
+      if (req.query.email) {
+        query = {
+          email: req.query.email,
+        };
+      }
+      const sellerProducts = await carsCollection.find(query).toArray();
+      res.send(sellerProducts);
+    });
     app.post("/allcars", async (req, res) => {
       const carInfo = req.body;
 
@@ -46,6 +56,18 @@ async function run() {
 
       const result = await usersCollection.insertOne(user);
       res.send(result);
+    });
+    app.get("/users/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ isAdmin: user?.role === "admin" });
+    });
+    app.get("/users/seller/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ isSeller: user?.role === "seller" });
     });
     app.post("/bookings", async (req, res) => {
       const booking = req.body;
