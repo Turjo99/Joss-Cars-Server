@@ -35,6 +35,17 @@ async function run() {
       const allcars = await carsCollection.find(query).toArray();
       res.send(allcars);
     });
+    app.get("/advertised", async (req, res) => {
+      let query = {};
+      if (req.query.isAdvertised) {
+        query = {
+          isAdvertised: req.query.isAdvertised,
+          isAvailable: req.query.isAvailable,
+        };
+      }
+      const advertisedCars = await carsCollection.find(query).toArray();
+      res.send(advertisedCars);
+    });
     app.post("/allcars", async (req, res) => {
       const carInfo = req.body;
 
@@ -67,7 +78,7 @@ async function run() {
       const options = { upsert: true };
       const updatedDoc = {
         $set: {
-          isAdvertised: true,
+          isAdvertised: "yes",
         },
       };
       const result = await carsCollection.updateOne(
