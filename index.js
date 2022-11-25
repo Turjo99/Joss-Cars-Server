@@ -61,6 +61,22 @@ async function run() {
       const seller = await usersCollection.find(query).toArray();
       res.send(seller);
     });
+    app.put("/allcars/advertise/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          isAdvertised: true,
+        },
+      };
+      const result = await carsCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
+    });
     app.put("/users/verify/:id", async (req, res) => {
       // const decodedEmail = req.decoded.email;
       // const query = { email: decodedEmail };
@@ -89,6 +105,12 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await usersCollection.deleteOne(query);
+      res.send(result);
+    });
+    app.delete("/allcars/delete/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await carsCollection.deleteOne(query);
       res.send(result);
     });
     app.post("/users", async (req, res) => {
