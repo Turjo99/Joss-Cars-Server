@@ -80,6 +80,17 @@ async function run() {
       const user = await usersCollection.findOne(query);
       res.send({ isSeller: user?.role === "seller" });
     });
+    app.get("/allsellers", async (req, res) => {
+      let query = {};
+      if (req.query.role) {
+        query = {
+          role: req.query.role,
+        };
+      }
+      const seller = await usersCollection.find(query).toArray();
+      res.send(seller);
+    });
+
     //All Get Operations Ends
 
     //  All Post Operation Starts
