@@ -88,6 +88,22 @@ async function run() {
       );
       res.send(result);
     });
+    app.put("/allcars/report/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          isReported: "yes",
+        },
+      };
+      const result = await carsCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
+    });
     app.put("/users/verify/:id", async (req, res) => {
       // const decodedEmail = req.decoded.email;
       // const query = { email: decodedEmail };
