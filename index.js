@@ -62,14 +62,14 @@ async function run() {
       const sellerProducts = await carsCollection.find(query).toArray();
       res.send(sellerProducts);
     });
-    app.get("/allsellers", async (req, res) => {
+    app.get("/allsellers/reportedproduct", async (req, res) => {
       let query = {};
-      if (req.query.role) {
+      if (req.query.isReported) {
         query = {
-          role: req.query.role,
+          isReported: req.query.isReported,
         };
       }
-      const seller = await usersCollection.find(query).toArray();
+      const seller = await carsCollection.find(query).toArray();
       res.send(seller);
     });
     app.put("/allcars/advertise/:id", async (req, res) => {
@@ -135,6 +135,12 @@ async function run() {
       res.send(result);
     });
     app.delete("/allcars/delete/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await carsCollection.deleteOne(query);
+      res.send(result);
+    });
+    app.delete("/report/delete/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await carsCollection.deleteOne(query);
