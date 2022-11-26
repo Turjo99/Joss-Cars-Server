@@ -20,6 +20,8 @@ async function run() {
     const carsCollection = client.db("jossCar").collection("allCars");
     const usersCollection = client.db("jossCar").collection("users");
     const bookingsCollection = client.db("jossCar").collection("bookings");
+
+    //  Get Operations Starts
     app.get("/categories", async (req, res) => {
       const query = {};
       const categories = await categoryCollection.find(query).toArray();
@@ -46,12 +48,6 @@ async function run() {
       const advertisedCars = await carsCollection.find(query).toArray();
       res.send(advertisedCars);
     });
-    app.post("/allcars", async (req, res) => {
-      const carInfo = req.body;
-
-      const result = await carsCollection.insertOne(carInfo);
-      res.send(result);
-    });
     app.get("/sellerproducts", async (req, res) => {
       let query = {};
       if (req.query.email) {
@@ -72,6 +68,43 @@ async function run() {
       const seller = await carsCollection.find(query).toArray();
       res.send(seller);
     });
+    app.get("/users/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ isAdmin: user?.role === "admin" });
+    });
+    app.get("/users/seller/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ isSeller: user?.role === "seller" });
+    });
+    //All Get Operations Ends
+
+    //  All Post Operation Starts
+    app.post("/allcars", async (req, res) => {
+      const carInfo = req.body;
+
+      const result = await carsCollection.insertOne(carInfo);
+      res.send(result);
+    });
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+
+    app.post("/bookings", async (req, res) => {
+      const booking = req.body;
+
+      const result = await bookingsCollection.insertOne(booking);
+      res.send(result);
+    });
+    //  All Post Operation Ends
+
+    // All Update Operation Starts
     app.put("/allcars/advertise/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
@@ -128,6 +161,9 @@ async function run() {
       );
       res.send(result);
     });
+    // All Update Operation Ends
+
+    // All Delete Operation Starts
     app.delete("/users/delete/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -146,30 +182,7 @@ async function run() {
       const result = await carsCollection.deleteOne(query);
       res.send(result);
     });
-    app.post("/users", async (req, res) => {
-      const user = req.body;
-
-      const result = await usersCollection.insertOne(user);
-      res.send(result);
-    });
-    app.get("/users/admin/:email", async (req, res) => {
-      const email = req.params.email;
-      const query = { email };
-      const user = await usersCollection.findOne(query);
-      res.send({ isAdmin: user?.role === "admin" });
-    });
-    app.get("/users/seller/:email", async (req, res) => {
-      const email = req.params.email;
-      const query = { email };
-      const user = await usersCollection.findOne(query);
-      res.send({ isSeller: user?.role === "seller" });
-    });
-    app.post("/bookings", async (req, res) => {
-      const booking = req.body;
-
-      const result = await bookingsCollection.insertOne(booking);
-      res.send(result);
-    });
+    // All Delete Operation Ends
   } finally {
   }
 }
