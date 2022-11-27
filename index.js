@@ -126,34 +126,41 @@ async function run() {
         clientSecret: paymentIntent.client_secret,
       });
     });
-    app.post("/payments", async (req, res) => {
+    app.put("/payments", async (req, res) => {
       const payment = req.body;
       const result = await paymentCollection.insertOne(payment);
-      const id = payment.bookingId;
+      // const id = payment.bookingId;
       const productID = payment.productID;
-      const filter = { _id: ObjectId(productID) };
-      const filter2 = { _id: ObjectId(productID) };
+      const option = { upsert: true };
+      const email = payment.email;
+      const filter2 = { productID: productID };
+      const filter1 = { _id: ObjectId(productID) };
+      console.log(productID);
+
       const updatedDoc = {
         $set: {
           isAvailable: "no",
           transactionId: payment.transactionId,
         },
       };
-
       const updatedDoc2 = {
         $set: {
           isAvailable: "no",
+          soldTo: email,
         },
       };
-      const updatedResult = await bookingsCollection.updateMany(
-        filter,
-        updatedDoc
+
+      const updatedResult = await carsCollection.updateOne(
+        filter1,
+        updatedDoc,
+        option
+      );
+      const updatedResult2 = await bookingsCollection.updateMany(
+        filter2,
+        updatedDoc2,
+        option
       );
 
-      const updatedResul2 = await carsCollection.updateOne(
-        filter2,
-        updatedDoc2
-      );
       res.send(result);
     });
     app.post("/allcars", async (req, res) => {
