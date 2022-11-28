@@ -46,7 +46,7 @@ async function run() {
       const user = await usersCollection.findOne(query);
       if (user) {
         const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, {
-          expiresIn: "1h",
+          expiresIn: "30d",
         });
         return res.send({ accessToken: token });
       }
@@ -89,7 +89,7 @@ async function run() {
       const sellerProducts = await carsCollection.find(query).toArray();
       res.send(sellerProducts);
     });
-    app.get("/seller", async (req, res) => {
+    app.get("/users", async (req, res) => {
       let query = {};
       if (req.query.email) {
         query = {
@@ -104,6 +104,7 @@ async function run() {
       if (req.query.isReported) {
         query = {
           isReported: req.query.isReported,
+          isAvailable: req.query.isAvailable,
         };
       }
       const seller = await carsCollection.find(query).toArray();
@@ -121,7 +122,7 @@ async function run() {
       const user = await usersCollection.findOne(query);
       res.send({ isSeller: user?.role === "seller" });
     });
-    app.get("/allsellers", async (req, res) => {
+    app.get("/allsellers", verifyJWT, async (req, res) => {
       let query = {};
       if (req.query.role) {
         query = {
@@ -211,9 +212,15 @@ async function run() {
     });
     app.post("/users", async (req, res) => {
       const user = req.body;
-
-      const result = await usersCollection.insertOne(user);
-      res.send(result);
+      const email = req.body.email;
+      const query = { email: email };
+      const filter = await usersCollection.findOne(query);
+      if (filter) {
+        return;
+      } else {
+        const result = await usersCollection.insertOne(user);
+        res.send(result);
+      }
     });
 
     app.post("/bookings", async (req, res) => {
